@@ -38,9 +38,51 @@
 
          ! this is the place to set any procedure pointers you want to change
          ! e.g., other_wind, other_mixing, other_energy  (see star_data.inc)
-
+         s% other_neu => tutorial_other_neu
 
       end subroutine extras_controls
+
+
+      subroutine tutorial_other_neu(  &
+           id, k, T, log10_T, Rho, log10_Rho, abar, zbar, z2bar, log10_Tlim, flags, &
+           loss, sources, ierr)
+         use neu_lib, only: neu_get
+         use neu_def
+         integer, intent(in) :: id ! id for star
+         integer, intent(in) :: k ! cell number or 0 if not for a particular cell
+         real(dp), intent(in) :: T ! temperature
+         real(dp), intent(in) :: log10_T ! log10 of temperature
+         real(dp), intent(in) :: Rho ! density
+         real(dp), intent(in) :: log10_Rho ! log10 of density
+         real(dp), intent(in) :: abar ! mean atomic weight
+         real(dp), intent(in) :: zbar ! mean charge
+         real(dp), intent(in) :: z2bar ! mean charge squared
+         real(dp), intent(in) :: log10_Tlim
+         logical, intent(inout) :: flags(num_neu_types) ! true if should include the type of loss
+         real(dp), intent(out) :: loss(num_neu_rvs) ! total from all sources
+         real(dp), intent(out) :: sources(num_neu_types, num_neu_rvs)
+         integer, intent(out) :: ierr
+
+         ! before we can use controls associated with the star we need to get access
+         type (star_info), pointer :: s
+         call star_ptr(id, s, ierr)
+         if (ierr /= 0) then ! OOPS
+            return
+         end if
+
+         ! separately control whether each type of neutrino loss is included
+         flags(pair_neu_type) = s% x_logical_ctrl(1)
+         flags(plas_neu_type) = s% x_logical_ctrl(2)
+         flags(phot_neu_type) = s% x_logical_ctrl(3)
+         flags(brem_neu_type) = s% x_logical_ctrl(4)
+         flags(reco_neu_type) = s% x_logical_ctrl(5)
+
+         ! the is the normal routine that MESA provides
+         call neu_get(  &
+             T, log10_T, Rho, log10_Rho, abar, zbar, z2bar, log10_Tlim, flags, &
+             loss, sources, ierr)
+
+      end subroutine tutorial_other_neu
 
 
       integer function extras_startup(s, id, restart, ierr)
