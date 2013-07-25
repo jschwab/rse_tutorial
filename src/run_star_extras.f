@@ -163,13 +163,41 @@
          type (star_info), pointer :: s
          integer, intent(in) :: id, id_extra
          integer :: ierr
+         integer :: f
          extras_finish_step = keep_going
          call store_extra_info(s)
 
-         ! to save a profile,
-            ! s% need_to_save_profiles_now = .true.
-         ! to update the star log,
-            ! s% need_to_update_history_now = .true.
+         ! MESA provides a number of variables that make it easy to get user input.
+         ! these are part of the star_info structure and are named
+         ! x_character_ctrl, x_integer_ctrl, x_logical_ctrl, and x_ctrl.
+         ! by default there are num_x_ctrls, which defaults to 100 of each.
+         ! they can be specified in the controls section of your inlist.
+
+         f = s% x_integer_ctrl(1)
+
+         ! MESA also provides a number variables that are useful for implementing
+         ! algorithms which require a state. if you just use these variables
+         ! restarts, retries, and backups will work without doing anything special.
+         ! they are named xtra1 .. xtra30, ixtra1 .. ixtra30, and lxtra1 .. lxtra30.
+         ! they are automatically versioned, that is if you set s% xtra1, then
+         ! s% xtra1_old will contains the value of s% xtra1 from the previous step
+         ! and s% xtra1_older contains the one from two steps ago.
+
+         s% xtra1 = s% log_center_density
+
+         ! this expression will evaluate to true if f times the log center density
+         ! has crossed an integer during the last step.  If f = 5, then we will get
+         ! output at log center density = {... 1.0, 1.2, 1.4, 1.6, 1.8, 2.0 ... }
+         if ((floor(f * s% xtra1_old) - floor(f * s% xtra1) .ne. 0)) then
+
+            ! save a profile & update the history
+            s% need_to_update_history_now = .true.
+            s% need_to_save_profiles_now = .true.
+
+            ! by default the priority is 1; you can change that if you'd like
+            ! s% save_profiles_model_priority = ?
+
+         endif
 
       end function extras_finish_step
 
