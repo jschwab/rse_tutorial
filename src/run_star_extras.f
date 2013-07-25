@@ -102,13 +102,21 @@
 
       ! returns either keep_going, retry, backup, or terminate.
       integer function extras_check_model(s, id, id_extra)
+
+         use chem_def, only : i_burn_ne, category_name
+
          type (star_info), pointer :: s
          integer, intent(in) :: id, id_extra
+         integer :: i_burn_max
          extras_check_model = keep_going
-         if (.false. .and. s% star_mass_h1 < 0.35d0) then
-            ! stop when star hydrogen mass drops to specified level
+
+         ! determine the category of maximum burning
+         i_burn_max = maxloc(s% L_by_category,1)
+
+         ! stop if the luminosity is dominated by neon burning
+         if ( i_burn_max .eq. i_burn_ne) then
             extras_check_model = terminate
-            write(*, *) 'have reached desired hydrogen mass'
+            write(*, *) 'terminating because neon burning is dominant'
             return
          end if
       end function extras_check_model
