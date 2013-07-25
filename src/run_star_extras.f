@@ -130,7 +130,7 @@
       integer function how_many_extra_profile_columns(s, id, id_extra)
          type (star_info), pointer :: s
          integer, intent(in) :: id, id_extra
-         how_many_extra_profile_columns = 0
+         how_many_extra_profile_columns = 1
       end function how_many_extra_profile_columns
 
 
@@ -143,16 +143,16 @@
          integer :: k
          ierr = 0
 
-         !note: do NOT add these names to profile_columns.list
+         ! note: do NOT add these names to profile_columns.list
          ! the profile_columns.list is only for the built-in profile column options.
          ! it must not include the new column names you are adding here.
 
          ! here is an example for adding a profile column
-         !if (n /= 1) stop 'data_for_extra_profile_columns'
-         !names(1) = 'beta'
-         !do k = 1, nz
-         !   vals(k,1) = s% Pgas(k)/s% P(k)
-         !end do
+         if (n /= 1) stop 'data_for_extra_profile_columns'
+         names(1) = 'beta'
+         do k = 1, nz
+            vals(k,1) = s% Pgas(k)/s% P(k)
+         end do
 
       end subroutine data_for_extra_profile_columns
 
