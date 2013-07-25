@@ -75,20 +75,53 @@
       integer function how_many_extra_history_columns(s, id, id_extra)
          type (star_info), pointer :: s
          integer, intent(in) :: id, id_extra
-         how_many_extra_history_columns = 0
+         how_many_extra_history_columns = 2
       end function how_many_extra_history_columns
 
 
       subroutine data_for_extra_history_columns(s, id, id_extra, n, names, vals, ierr)
+
+         ! MESA provides routines for taking logarithms which will handle
+         ! cases where you pass them zero, etc.  Take advantage of this!
+         use num_lib, only : safe_log10
+
          type (star_info), pointer :: s
          integer, intent(in) :: id, id_extra, n
          character (len=maxlen_history_column_name) :: names(n)
          real(dp) :: vals(n)
          integer, intent(out) :: ierr
 
-         !note: do NOT add these names to history_columns.list
+         real(dp), parameter :: frac = 0.90
+         integer :: i
+         real(dp) :: edot, edot_partial
+
+         ! calculate the total nuclear energy release rate by integrating
+         ! the specific rate (eps_nuc) over the star.  using the dot_product
+         ! intrinsic is a common idiom for calculating integrated quantities.
+         ! note that one needs to explicitly limit the range of the arrays.
+         ! never assume that the array size is the same as the number of zones.
+         edot = dot_product(s% dm(1:s% nz), s% eps_nuc(1:s% nz))
+
+         ! the center of the star is at i = s% nz and the surface at i = 1 .
+         ! so go from the center outward until 90% of the integrated eps_nuc
+         ! is enclosed.  exit and then i will contain the desired cell index.
+         edot_partial = 0
+         do i = s% nz, 1, -1
+            edot_partial = edot_partial + s% dm(i) * s% eps_nuc(i)
+            if (edot_partial .ge. (frac * edot)) exit
+         end do
+
+         ! note: do NOT add these names to history_columns.list
          ! the history_columns.list is only for the built-in log column options.
          ! it must not include the new column names you are adding here.
+
+         ! column 1
+         names(1) = "m90"
+         vals(1) = s% q(i) * s% star_mass  ! in solar masses
+
+         ! column 2
+         names(2) = "log_R90"
+         vals(2) = safe_log10(s% R(i) / rsol) ! in solar radii
 
          ierr = 0
       end subroutine data_for_extra_history_columns
