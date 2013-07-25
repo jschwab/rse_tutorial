@@ -21,4 +21,13 @@
   ! specifiy how many profiles to output per logarithmic decade in central denisty
       x_integer_ctrl(1) = 5
 
+  ! use other_neu routine, which no provides flags to select neutrino loss types
+      use_other_neu = .true.
+
+      x_logical_ctrl(1) = .true. ! pair
+      x_logical_ctrl(2) = .true. ! plas
+      x_logical_ctrl(3) = .true. ! phot
+      x_logical_ctrl(4) = .true. ! brem
+      x_logical_ctrl(5) = .true. ! reco
+
 / !end of controls
