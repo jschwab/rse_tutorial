@@ -18,4 +18,7 @@
       use_type2_opacities = .true.
       Zbase = 0.02
 
+  ! specifiy how many profiles to output per logarithmic decade in central denisty
+      x_integer_ctrl(1) = 5
+
 / !end of controls
