@@ -6,6 +6,10 @@
   ! plot or not
       pgstar_flag = .true.
 
+  ! control the output
+      history_columns_file = 'history_columns.list'
+      profile_columns_file = 'profile_columns.list'
+
 / !end of star_job
 
 &controls
