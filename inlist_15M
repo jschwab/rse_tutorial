@@ -1,0 +1,21 @@
+&star_job
+
+  ! choose starting model
+      create_pre_main_sequence_model = .true.
+
+  ! plot or not
+      pgstar_flag = .true.
+
+/ !end of star_job
+
+&controls
+
+  ! starting specifications
+      initial_mass = 15d0 ! in Msun units
+      initial_Z = 0.02d0 ! solar metalicity
+
+  ! use C/O enhanced opacities
+      use_type2_opacities = .true.
+      Zbase = 0.02
+
+/ !end of controls

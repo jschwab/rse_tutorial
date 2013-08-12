@@ -1,0 +1,6 @@
+&pgstar
+
+    ! don't show the main window
+        MAIN_win_flag = .true.
+
+/ ! end of pgstar namelist
