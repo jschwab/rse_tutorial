@@ -253,12 +253,12 @@
       !he4_bdy_omega
       !he4_bdy_omega_div_omega_crit
 
-      !c12_boundary_mass
+      c12_boundary_mass
          ! c12 boundary is first location going inward from he4 boundary
          ! with c12 abundance <= c12_boundary_limit
-      !c12_boundary_radius
-      !c12_boundary_lgT
-      !c12_boundary_lgRho
+      c12_boundary_radius
+      c12_boundary_lgT
+      c12_boundary_lgRho
       !c12_boundary_L
       !c12_boundary_v
       !c12_bdy_to_phot_sound_time ! (seconds) 
